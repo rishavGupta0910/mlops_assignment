@@ -1,0 +1,14 @@
+artifact_uri: /Users/rishavgupta/Desktop/mlops/mlops_assignment/experiment_tracking/242041841724677674/88c9367d09ed4effa1c1b0e9c5417072/artifacts
+end_time: 1777881950814
+entry_point_name: ''
+experiment_id: '242041841724677674'
+lifecycle_stage: active
+run_id: 88c9367d09ed4effa1c1b0e9c5417072
+run_name: RandomForest
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1777881947778
+status: 3
+tags: []
+user_id: rishavgupta

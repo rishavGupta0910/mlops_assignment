@@ -1,6 +1,5 @@
-# MLflow tracking data (contains absolute local paths, regenerate with: python src/train.py)
-experiment_tracking/
-training_artifacts/
+# Model pickle files (generated during CI/CD pipeline by train.py)
+models/*.pkl
 
 # Python
 __pycache__/

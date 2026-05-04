@@ -1,0 +1,14 @@
+artifact_uri: /Users/rishavgupta/Desktop/mlops/mlops_assignment/experiment_tracking/242041841724677674/7ac24840839b40dd962d8ef8b0ee61c8/artifacts
+end_time: 1777880599576
+entry_point_name: ''
+experiment_id: '242041841724677674'
+lifecycle_stage: active
+run_id: 7ac24840839b40dd962d8ef8b0ee61c8
+run_name: LogisticRegression
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1777880594098
+status: 3
+tags: []
+user_id: rishavgupta

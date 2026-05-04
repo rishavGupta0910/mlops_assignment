@@ -1,0 +1,10 @@
+artifact_location: /Users/rishavgupta/Desktop/mlops/mlops_assignment/experiment_tracking/242041841724677674/models/m-40c86942d23b4dd8b8ce87f8ebfa7964/artifacts
+creation_timestamp: 1777881030273
+experiment_id: '242041841724677674'
+last_updated_timestamp: 1777881032334
+model_id: m-40c86942d23b4dd8b8ce87f8ebfa7964
+model_type: null
+name: model
+source_run_id: 66775e32242c4779b5b17365c9e6d12a
+status: 2
+status_message: null

@@ -1,0 +1,8 @@
+artifact_location: /Users/rishavgupta/Desktop/mlops/mlops_assignment/experiment_tracking/242041841724677674
+creation_time: 1777879210197
+experiment_id: '242041841724677674'
+last_update_time: 1777879210197
+lifecycle_stage: active
+name: heart-disease-classification
+trace_location: null
+workspace: default

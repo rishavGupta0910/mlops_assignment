@@ -279,7 +279,86 @@ def main():
         json.dump(all_metadata, f, indent=2)
     print(f"Saved metadata to {metadata_path}")
 
+    # Export MLflow experiment summary to screenshots/mlflow/
+    # This provides proof of logged params, metrics, artifacts for the assignment
+    export_experiment_summary(results, models, SCREENSHOTS_DIR)
+
     return results
+
+
+def export_experiment_summary(results, model_configs, output_dir):
+    """
+    Export a clean summary of all MLflow experiment runs
+    (parameters, metrics, artifacts) with timestamps for submission.
+
+    Creates a time-based subfolder inside output_dir for each training run,
+    e.g. screenshots/mlflow/run_2026-05-04_13-13-25/
+    """
+    from datetime import datetime
+    import shutil
+
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    folder_timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    run_dir = os.path.join(output_dir, f"run_{folder_timestamp}")
+    os.makedirs(run_dir, exist_ok=True)
+
+    # 1. Metrics comparison CSV with timestamp
+    results_df = pd.DataFrame(results).T
+    results_df.index.name = "model"
+    results_df["run_timestamp"] = timestamp
+    csv_path = os.path.join(run_dir, "experiment_metrics_comparison.csv")
+    results_df.to_csv(csv_path)
+    print(f"Exported metrics comparison to {csv_path}")
+
+    # 2. Full experiment log (params + metrics + timestamps per model)
+    experiment_log = {
+        "experiment_name": "heart-disease-classification",
+        "run_timestamp": timestamp,
+        "dataset": "Heart Disease UCI (Cleveland) via ucimlrepo",
+        "total_samples": 303,
+        "train_test_split": "80/20 stratified",
+        "runs": {},
+    }
+    for name, config in model_configs.items():
+        experiment_log["runs"][name] = {
+            "run_timestamp": timestamp,
+            "parameters": {
+                "model_type": name,
+                "test_size": 0.2,
+                "cv_folds": 5,
+                "hyperparameter_grid": {
+                    k: str(v) for k, v in config["params"].items()
+                },
+            },
+            "metrics": {
+                k: round(float(v), 4) for k, v in results[name].items()
+            },
+            "artifacts": [
+                f"confusion_matrix_{name}.png",
+                f"roc_curve_{name}.png",
+            ]
+        }
+        if name in ("RandomForest", "GradientBoosting"):
+            experiment_log["runs"][name]["artifacts"].append(
+                f"feature_importance_{name}.png"
+            )
+
+    log_path = os.path.join(run_dir, "experiment_runs_log.json")
+    with open(log_path, "w") as f:
+        json.dump(experiment_log, f, indent=2)
+    print(f"Exported experiment log to {log_path}")
+
+    # 3. Copy artifact plots into the time-based run folder
+    for name in model_configs:
+        src_dir = os.path.join(TRAINING_ARTIFACTS_DIR, name)
+        if os.path.exists(src_dir):
+            for fname in os.listdir(src_dir):
+                if fname.endswith(".png"):
+                    shutil.copy2(
+                        os.path.join(src_dir, fname),
+                        os.path.join(run_dir, fname)
+                    )
+    print(f"Copied artifact plots to {run_dir}")
 
 
 if __name__ == "__main__":
