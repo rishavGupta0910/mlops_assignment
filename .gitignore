@@ -1,0 +1,26 @@
+# MLflow tracking data (contains absolute local paths, regenerate with: python src/train.py)
+experiment_tracking/
+training_artifacts/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+.env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
