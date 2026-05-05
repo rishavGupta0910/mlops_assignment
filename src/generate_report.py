@@ -278,6 +278,30 @@ def generate_report():
         "viewed by running: mlflow ui --backend-store-uri experiment_tracking/"
     )
 
+    add_heading_styled(doc, "Experiment Tracking Directory Structure", level=2)
+    doc.add_paragraph(
+        "Since MLflow uses internally generated IDs for its directory structure "
+        "(not human-readable), we also export a clean, time-based summary after "
+        "each training run to screenshots/mlflow/. Each run creates a timestamped "
+        "subfolder (e.g., run_2026-05-04_13-20-32/) containing:"
+    )
+    export_items = [
+        "experiment_metrics_comparison.csv - side-by-side comparison of all model metrics with run timestamp",
+        "experiment_runs_log.json - full experiment log including hyperparameter grids, best parameters, and artifact references",
+        "Confusion matrix, ROC curve, and feature importance plots for all models",
+    ]
+    for item in export_items:
+        doc.add_paragraph(item, style="List Bullet")
+
+    add_heading_styled(doc, "Training Artifacts", level=2)
+    doc.add_paragraph(
+        "The training_artifacts/ directory stores the raw plots (confusion matrices, "
+        "ROC curves, feature importance charts) generated during each model's training. "
+        "These are organized by model name (e.g., training_artifacts/LogisticRegression/). "
+        "MLflow logs these as artifacts within each run, and they are also copied into "
+        "the time-based screenshots/mlflow/ folders for easy reference."
+    )
+
     # Add MLflow UI screenshots
     mlflow_dir = os.path.join(SCREENSHOTS_DIR, "mlflow")
     add_image_if_exists(
@@ -291,29 +315,118 @@ def generate_report():
 
     doc.add_page_break()
 
-    # ========== PAGES 9-10: CI/CD, DEPLOYMENT, MONITORING (placeholders) ==========
-    add_heading_styled(doc, "5. CI/CD Pipeline & Automated Testing", level=1)
+    # ========== MODEL PACKAGING & REPRODUCIBILITY ==========
+    add_heading_styled(doc, "5. Model Packaging & Reproducibility", level=1)
+
+    doc.add_paragraph(
+        "All three trained models are serialized as full scikit-learn pipelines "
+        "(ColumnTransformer + Classifier) using joblib pickle format. This means "
+        "the model file contains both the preprocessing and classification logic, "
+        "so raw features can be fed directly without separate preprocessing steps."
+    )
+
+    add_heading_styled(doc, "Inference Script", level=2)
+    doc.add_paragraph(
+        "A standalone inference script (src/inference.py) allows command-line "
+        "predictions without running the API server:"
+    )
+    doc.add_paragraph(
+        'python src/inference.py --input \'{"age": 63, "sex": 1, "cp": 3, ...}\'',
+        style="List Bullet",
+    )
+    doc.add_paragraph(
+        "The script automatically loads the best model (from models_metadata.json) "
+        "and returns the prediction, label, confidence score, and model name."
+    )
+
+    add_heading_styled(doc, "Model Artifacts", level=2)
+    model_files = [
+        "models/LogisticRegression.pkl - Best model (ROC-AUC: 0.9643)",
+        "models/RandomForest.pkl - Second best (ROC-AUC: 0.9556)",
+        "models/GradientBoosting.pkl - Third (ROC-AUC: 0.9177)",
+        "models/models_metadata.json - Metrics, best model indicator, feature list",
+    ]
+    for item in model_files:
+        doc.add_paragraph(item, style="List Bullet")
+
+    add_heading_styled(doc, "Unit Tests", level=2)
+    doc.add_paragraph(
+        "32 unit tests cover the full pipeline using Pytest:"
+    )
+    test_items = [
+        "test_data_loader.py (5 tests) - data shape, columns, target values",
+        "test_preprocessing.py (8 tests) - missing value handling, binarization",
+        "test_model.py (10 tests) - model loading, prediction format, all 3 models",
+        "test_api.py (9 tests) - API endpoints, validation, error handling",
+    ]
+    for item in test_items:
+        doc.add_paragraph(item, style="List Bullet")
+
+    doc.add_page_break()
+
+    # ========== MODEL CONTAINERIZATION ==========
+    add_heading_styled(doc, "6. Model Containerization (Docker)", level=1)
+
+    add_heading_styled(doc, "FastAPI Application", level=2)
+    doc.add_paragraph(
+        "The prediction API is built with FastAPI (api/app.py) and exposes "
+        "the following endpoints:"
+    )
+    endpoints = [
+        "GET /health - Returns model status, confirms model is loaded and ready",
+        "POST /predict - Accepts 13 patient features (JSON), returns prediction (0/1), "
+        "confidence score, prediction label, and model name",
+        "GET /metrics - Prometheus-format metrics (request count, latency histogram, "
+        "auto-instrumented via prometheus-fastapi-instrumentator)",
+    ]
+    for ep in endpoints:
+        doc.add_paragraph(ep, style="List Bullet")
+
+    doc.add_paragraph(
+        "Input validation uses Pydantic models with range constraints on all 13 "
+        "features (e.g., age >= 0, sex in [0,1], cp in [0,3]). Invalid inputs "
+        "return HTTP 422 with detailed error messages."
+    )
+
+    add_heading_styled(doc, "Docker Configuration", level=2)
+    doc.add_paragraph(
+        "The Dockerfile uses python:3.11-slim as the base image, installs pinned "
+        "dependencies from requirements.txt, copies the source code, API, and model "
+        "artifacts, and runs uvicorn on port 8000."
+    )
+    doc.add_paragraph(
+        "Build and run commands:"
+    )
+    docker_cmds = [
+        "docker build -t heart-disease-api .",
+        "docker run -p 8000:8000 heart-disease-api",
+    ]
+    for cmd in docker_cmds:
+        doc.add_paragraph(cmd, style="List Bullet")
+
+    doc.add_paragraph(
+        "The containerized API was tested locally with curl, confirming both "
+        "/health and /predict endpoints return correct responses."
+    )
+
+    doc.add_page_break()
+
+    # ========== CI/CD (Day 3 placeholder) ==========
+    add_heading_styled(doc, "7. CI/CD Pipeline & Automated Testing", level=1)
     doc.add_paragraph(
         "[To be completed on Day 3 - GitHub Actions pipeline with lint, test, "
         "train, build+push, deploy stages]"
     )
 
     doc.add_paragraph("")
-    add_heading_styled(doc, "6. Model Containerization (Docker)", level=1)
-    doc.add_paragraph(
-        "[To be completed on Day 2 - FastAPI /predict endpoint, Dockerfile, "
-        "local container testing]"
-    )
-
-    doc.add_paragraph("")
-    add_heading_styled(doc, "7. Production Deployment (GKE)", level=1)
+    add_heading_styled(doc, "8. Production Deployment (GKE)", level=1)
     doc.add_paragraph(
         "[To be completed on Day 3 - GKE cluster, K8s manifests, LoadBalancer "
         "service, public API endpoint]"
     )
 
     doc.add_paragraph("")
-    add_heading_styled(doc, "8. Monitoring & Logging", level=1)
+    add_heading_styled(doc, "9. Monitoring & Logging", level=1)
     doc.add_paragraph(
         "[To be completed on Day 4 - Prometheus metrics, Grafana dashboard, "
         "API request logging]"
@@ -321,14 +434,12 @@ def generate_report():
 
     doc.add_page_break()
 
-    add_heading_styled(doc, "9. Architecture Diagram", level=1)
+    add_heading_styled(doc, "10. Architecture Diagram & Conclusion", level=1)
     doc.add_paragraph(
         "[To be added - End-to-end pipeline diagram: Data -> Preprocessing -> "
         "Training (MLflow) -> Model Packaging -> Docker -> GKE -> API -> Monitoring]"
     )
-
     doc.add_paragraph("")
-    add_heading_styled(doc, "10. Conclusion", level=1)
     doc.add_paragraph(
         "[To be completed on Day 4 - Summary of findings, lessons learned, "
         "and link to code repository]"

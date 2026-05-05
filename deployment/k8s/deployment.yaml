@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: heart-disease-api
+  labels:
+    app: heart-disease-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: heart-disease-api
+  template:
+    metadata:
+      labels:
+        app: heart-disease-api
+    spec:
+      containers:
+        - name: heart-disease-api
+          image: us-central1-docker.pkg.dev/mlops-personal-lab/mlops-repo/heart-disease-api:latest
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
