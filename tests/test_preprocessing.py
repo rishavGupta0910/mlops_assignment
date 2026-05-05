@@ -1,6 +1,5 @@
 """Tests for preprocessing module."""
 
-import pytest
 import pandas as pd
 import sys
 import os

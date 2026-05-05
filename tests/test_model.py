@@ -1,12 +1,11 @@
 """Tests for model loading and inference."""
 
 import pytest
-import json
 import sys
 import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-from inference import load_model, predict, EXPECTED_FEATURES
+from inference import load_model, predict
 
 SAMPLE_INPUT = {
     "age": 63, "sex": 1, "cp": 3, "trestbps": 145,

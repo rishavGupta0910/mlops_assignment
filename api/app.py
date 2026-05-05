@@ -19,7 +19,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 # Add src to path for inference module
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src"))
-from inference import load_model, predict, EXPECTED_FEATURES
+from inference import load_model, predict
 
 # Logging setup
 logging.basicConfig(

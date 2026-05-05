@@ -1,6 +1,5 @@
 """Tests for data_loader module."""
 
-import pytest
 import pandas as pd
 import sys
 import os

@@ -21,7 +21,7 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.model_selection import cross_val_score, GridSearchCV
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
-    roc_auc_score, confusion_matrix, ConfusionMatrixDisplay,
+    roc_auc_score, ConfusionMatrixDisplay,
     RocCurveDisplay
 )
 from sklearn.pipeline import Pipeline
@@ -179,7 +179,7 @@ def train_and_log_model(model_name, model, param_grid, X_train, X_test,
         print(f"Model: {model_name}")
         print(f"Best params: {grid_search.best_params_}")
         print(f"CV ROC-AUC: {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
-        print(f"Test metrics:")
+        print("Test metrics:")
         for k, v in metrics.items():
             print(f"  {k}: {v:.4f}")
 
