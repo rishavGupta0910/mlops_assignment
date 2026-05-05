@@ -415,19 +415,85 @@ def generate_report():
 
     doc.add_page_break()
 
-    # ========== CI/CD (Day 3 placeholder) ==========
+    # ========== CI/CD PIPELINE ==========
     add_heading_styled(doc, "7. CI/CD Pipeline & Automated Testing", level=1)
+
     doc.add_paragraph(
-        "[To be completed on Day 3 - GitHub Actions pipeline with lint, test, " "train, build+push, deploy stages]"
+        "A GitHub Actions CI/CD pipeline (.github/workflows/ci-cd.yml) automates "
+        "the full lifecycle from code push to production deployment."
     )
 
-    doc.add_paragraph("")
+    add_heading_styled(doc, "Pipeline Stages", level=2)
+    stages = [
+        "Lint - flake8 (style checks) + black --check (formatting verification)",
+        "Test - install dependencies, train model (fresh), run pytest (32 tests)",
+        "Build & Push - train model, build Docker image, push to GCP Artifact Registry",
+        "Deploy - get GKE credentials, kubectl set image, verify rollout status",
+    ]
+    for stage in stages:
+        doc.add_paragraph(stage, style="List Bullet")
+
+    doc.add_paragraph(
+        "The pipeline triggers on push to main and on pull requests. Build & Push "
+        "and Deploy stages only run on main branch pushes. Each stage depends on "
+        "the previous one, ensuring failures are caught early."
+    )
+
+    add_heading_styled(doc, "GitHub Secrets", level=2)
+    secrets = [
+        "GCP_SA_KEY - Service account JSON key for GCP authentication",
+        "GCP_PROJECT_ID - mlops-personal-lab",
+        "GKE_CLUSTER - mlops-cluster",
+        "GKE_ZONE - us-central1-a",
+    ]
+    for s in secrets:
+        doc.add_paragraph(s, style="List Bullet")
+
+    doc.add_page_break()
+
+    # ========== PRODUCTION DEPLOYMENT ==========
     add_heading_styled(doc, "8. Production Deployment (GKE)", level=1)
+
     doc.add_paragraph(
-        "[To be completed on Day 3 - GKE cluster, K8s manifests, LoadBalancer " "service, public API endpoint]"
+        "The model API is deployed to Google Kubernetes Engine (GKE) using a "
+        "zonal Standard cluster with 1 e2-small node."
     )
 
-    doc.add_paragraph("")
+    add_heading_styled(doc, "GCP Infrastructure", level=2)
+    infra_items = [
+        "Project: mlops-personal-lab",
+        "Cluster: mlops-cluster (us-central1-a, 1 node, e2-small)",
+        "Container Registry: us-central1-docker.pkg.dev/mlops-personal-lab/mlops-repo",
+        "Service Account: github-actions-sa (Artifact Registry Writer + GKE Developer)",
+    ]
+    for item in infra_items:
+        doc.add_paragraph(item, style="List Bullet")
+
+    add_heading_styled(doc, "Kubernetes Configuration", level=2)
+    doc.add_paragraph(
+        "The deployment uses 1 replica with resource requests of 100m CPU / 128Mi memory "
+        "and limits of 250m CPU / 256Mi memory. Liveness and readiness probes hit the "
+        "/health endpoint to ensure the pod is serving traffic correctly."
+    )
+    doc.add_paragraph(
+        "A LoadBalancer Service exposes the API on port 80 (forwarding to container port 8000), "
+        "provisioning a public IP address automatically."
+    )
+
+    add_heading_styled(doc, "Live Endpoint", level=2)
+    doc.add_paragraph("The API is accessible at: http://34.60.20.112")
+    doc.add_paragraph("Verified endpoints:")
+    verified = [
+        "GET /health - returns model status and readiness",
+        "POST /predict - accepts patient features, returns prediction with confidence",
+        "GET /metrics - Prometheus-format metrics for monitoring",
+    ]
+    for v in verified:
+        doc.add_paragraph(v, style="List Bullet")
+
+    doc.add_page_break()
+
+    # ========== MONITORING (Day 4 placeholder) ==========
     add_heading_styled(doc, "9. Monitoring & Logging", level=1)
     doc.add_paragraph("[To be completed on Day 4 - Prometheus metrics, Grafana dashboard, " "API request logging]")
 
