@@ -41,7 +41,7 @@ warnings.filterwarnings("ignore")
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODELS_DIR = os.path.join(BASE_DIR, "models")
 SCREENSHOTS_DIR = os.path.join(BASE_DIR, "screenshots", "mlflow")
-EXPERIMENT_TRACKING_DIR = os.path.join(BASE_DIR, "experiment_tracking")
+EXPERIMENT_TRACKING_DIR = os.environ.get("MLFLOW_TRACKING_DIR", os.path.join(BASE_DIR, "experiment_tracking"))
 TRAINING_ARTIFACTS_DIR = os.path.join(BASE_DIR, "training_artifacts")
 
 

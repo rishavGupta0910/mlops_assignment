@@ -40,6 +40,8 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run training to generate models
         run: python src/train.py
+        env:
+          MLFLOW_TRACKING_DIR: ${{ github.workspace }}/mlflow_ci
       - name: Run tests
         run: pytest tests/ -v --tb=short
       - name: Upload test results
@@ -64,6 +66,8 @@ jobs:
         run: |
           pip install -r requirements.txt
           python src/train.py
+        env:
+          MLFLOW_TRACKING_DIR: ${{ github.workspace }}/mlflow_ci
 
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v2
