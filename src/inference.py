@@ -21,8 +21,19 @@ MODELS_DIR = os.path.join(BASE_DIR, "models")
 METADATA_PATH = os.path.join(MODELS_DIR, "models_metadata.json")
 
 EXPECTED_FEATURES = [
-    "age", "sex", "cp", "trestbps", "chol", "fbs",
-    "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal"
+    "age",
+    "sex",
+    "cp",
+    "trestbps",
+    "chol",
+    "fbs",
+    "restecg",
+    "thalach",
+    "exang",
+    "oldpeak",
+    "slope",
+    "ca",
+    "thal",
 ]
 
 
@@ -93,16 +104,10 @@ def predict(input_data, model_name=None):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Heart Disease Prediction Inference"
-    )
+    parser = argparse.ArgumentParser(description="Heart Disease Prediction Inference")
+    parser.add_argument("--input", type=str, required=True, help="JSON string with patient features")
     parser.add_argument(
-        "--input", type=str, required=True,
-        help="JSON string with patient features"
-    )
-    parser.add_argument(
-        "--model", type=str, default=None,
-        help="Model name (LogisticRegression, RandomForest, GradientBoosting)"
+        "--model", type=str, default=None, help="Model name (LogisticRegression, RandomForest, GradientBoosting)"
     )
     args = parser.parse_args()
 

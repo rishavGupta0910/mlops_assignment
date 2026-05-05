@@ -42,6 +42,7 @@ Instrumentator().instrument(app).expose(app)
 
 class PatientFeatures(BaseModel):
     """Input schema for patient clinical features."""
+
     age: float = Field(..., ge=0, le=120, description="Age in years")
     sex: float = Field(..., ge=0, le=1, description="Sex (0=female, 1=male)")
     cp: float = Field(..., ge=0, le=3, description="Chest pain type (0-3)")
@@ -59,6 +60,7 @@ class PatientFeatures(BaseModel):
 
 class PredictionResponse(BaseModel):
     """Output schema for prediction results."""
+
     prediction: int
     prediction_label: str
     confidence: float
@@ -68,6 +70,7 @@ class PredictionResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     """Output schema for health check."""
+
     status: str
     model_loaded: bool
     model_name: str

@@ -55,9 +55,7 @@ def generate_report():
 
     subtitle = doc.add_paragraph()
     subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = subtitle.add_run(
-        "End-to-End ML Model Development, CI/CD, and Production Deployment"
-    )
+    run = subtitle.add_run("End-to-End ML Model Development, CI/CD, and Production Deployment")
     run.font.size = Pt(14)
     run.font.color.rgb = RGBColor(100, 100, 100)
 
@@ -182,23 +180,31 @@ def generate_report():
     # Add EDA plots
     eda_dir = os.path.join(SCREENSHOTS_DIR, "eda")
     add_image_if_exists(
-        doc, os.path.join(eda_dir, "class_balance.png"),
-        width=Inches(5), caption="Figure 1: Class distribution (original and binary)"
+        doc,
+        os.path.join(eda_dir, "class_balance.png"),
+        width=Inches(5),
+        caption="Figure 1: Class distribution (original and binary)",
     )
     add_image_if_exists(
-        doc, os.path.join(eda_dir, "correlation_heatmap.png"),
-        width=Inches(5), caption="Figure 2: Feature correlation heatmap"
+        doc,
+        os.path.join(eda_dir, "correlation_heatmap.png"),
+        width=Inches(5),
+        caption="Figure 2: Feature correlation heatmap",
     )
 
     doc.add_page_break()
 
     add_image_if_exists(
-        doc, os.path.join(eda_dir, "feature_distributions.png"),
-        width=Inches(5.5), caption="Figure 3: Feature distributions by target class"
+        doc,
+        os.path.join(eda_dir, "feature_distributions.png"),
+        width=Inches(5.5),
+        caption="Figure 3: Feature distributions by target class",
     )
     add_image_if_exists(
-        doc, os.path.join(eda_dir, "boxplots_by_target.png"),
-        width=Inches(5.5), caption="Figure 4: Numerical features box plots"
+        doc,
+        os.path.join(eda_dir, "boxplots_by_target.png"),
+        width=Inches(5.5),
+        caption="Figure 4: Numerical features box plots",
     )
 
     doc.add_page_break()
@@ -248,12 +254,13 @@ def generate_report():
         )
 
     add_image_if_exists(
-        doc, os.path.join(eda_dir, "roc_curves_comparison.png"),
-        width=Inches(4.5), caption="Figure 5: ROC curves for all models"
+        doc,
+        os.path.join(eda_dir, "roc_curves_comparison.png"),
+        width=Inches(4.5),
+        caption="Figure 5: ROC curves for all models",
     )
     add_image_if_exists(
-        doc, os.path.join(eda_dir, "confusion_matrices.png"),
-        width=Inches(5.5), caption="Figure 6: Confusion matrices"
+        doc, os.path.join(eda_dir, "confusion_matrices.png"), width=Inches(5.5), caption="Figure 6: Confusion matrices"
     )
 
     doc.add_page_break()
@@ -305,12 +312,16 @@ def generate_report():
     # Add MLflow UI screenshots
     mlflow_dir = os.path.join(SCREENSHOTS_DIR, "mlflow")
     add_image_if_exists(
-        doc, os.path.join(mlflow_dir, "training_runs.png"),
-        width=Inches(5.5), caption="Figure 7: MLflow UI - All experiment runs"
+        doc,
+        os.path.join(mlflow_dir, "training_runs.png"),
+        width=Inches(5.5),
+        caption="Figure 7: MLflow UI - All experiment runs",
     )
     add_image_if_exists(
-        doc, os.path.join(mlflow_dir, "logistic_regression.png"),
-        width=Inches(5.5), caption="Figure 8: MLflow UI - Logistic Regression run details"
+        doc,
+        os.path.join(mlflow_dir, "logistic_regression.png"),
+        width=Inches(5.5),
+        caption="Figure 8: MLflow UI - Logistic Regression run details",
     )
 
     doc.add_page_break()
@@ -350,9 +361,7 @@ def generate_report():
         doc.add_paragraph(item, style="List Bullet")
 
     add_heading_styled(doc, "Unit Tests", level=2)
-    doc.add_paragraph(
-        "32 unit tests cover the full pipeline using Pytest:"
-    )
+    doc.add_paragraph("32 unit tests cover the full pipeline using Pytest:")
     test_items = [
         "test_data_loader.py (5 tests) - data shape, columns, target values",
         "test_preprocessing.py (8 tests) - missing value handling, binarization",
@@ -368,10 +377,7 @@ def generate_report():
     add_heading_styled(doc, "6. Model Containerization (Docker)", level=1)
 
     add_heading_styled(doc, "FastAPI Application", level=2)
-    doc.add_paragraph(
-        "The prediction API is built with FastAPI (api/app.py) and exposes "
-        "the following endpoints:"
-    )
+    doc.add_paragraph("The prediction API is built with FastAPI (api/app.py) and exposes " "the following endpoints:")
     endpoints = [
         "GET /health - Returns model status, confirms model is loaded and ready",
         "POST /predict - Accepts 13 patient features (JSON), returns prediction (0/1), "
@@ -394,9 +400,7 @@ def generate_report():
         "dependencies from requirements.txt, copies the source code, API, and model "
         "artifacts, and runs uvicorn on port 8000."
     )
-    doc.add_paragraph(
-        "Build and run commands:"
-    )
+    doc.add_paragraph("Build and run commands:")
     docker_cmds = [
         "docker build -t heart-disease-api .",
         "docker run -p 8000:8000 heart-disease-api",
@@ -414,23 +418,18 @@ def generate_report():
     # ========== CI/CD (Day 3 placeholder) ==========
     add_heading_styled(doc, "7. CI/CD Pipeline & Automated Testing", level=1)
     doc.add_paragraph(
-        "[To be completed on Day 3 - GitHub Actions pipeline with lint, test, "
-        "train, build+push, deploy stages]"
+        "[To be completed on Day 3 - GitHub Actions pipeline with lint, test, " "train, build+push, deploy stages]"
     )
 
     doc.add_paragraph("")
     add_heading_styled(doc, "8. Production Deployment (GKE)", level=1)
     doc.add_paragraph(
-        "[To be completed on Day 3 - GKE cluster, K8s manifests, LoadBalancer "
-        "service, public API endpoint]"
+        "[To be completed on Day 3 - GKE cluster, K8s manifests, LoadBalancer " "service, public API endpoint]"
     )
 
     doc.add_paragraph("")
     add_heading_styled(doc, "9. Monitoring & Logging", level=1)
-    doc.add_paragraph(
-        "[To be completed on Day 4 - Prometheus metrics, Grafana dashboard, "
-        "API request logging]"
-    )
+    doc.add_paragraph("[To be completed on Day 4 - Prometheus metrics, Grafana dashboard, " "API request logging]")
 
     doc.add_page_break()
 
@@ -441,8 +440,7 @@ def generate_report():
     )
     doc.add_paragraph("")
     doc.add_paragraph(
-        "[To be completed on Day 4 - Summary of findings, lessons learned, "
-        "and link to code repository]"
+        "[To be completed on Day 4 - Summary of findings, lessons learned, " "and link to code repository]"
     )
 
     # Save

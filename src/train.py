@@ -12,6 +12,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import mlflow
@@ -20,9 +21,13 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.model_selection import cross_val_score, GridSearchCV
 from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score,
-    roc_auc_score, ConfusionMatrixDisplay,
-    RocCurveDisplay
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+    ConfusionMatrixDisplay,
+    RocCurveDisplay,
 )
 from sklearn.pipeline import Pipeline
 import joblib
@@ -59,8 +64,7 @@ def plot_confusion_matrix(y_test, y_pred, model_name, output_dir):
     """Save confusion matrix plot."""
     fig, ax = plt.subplots(figsize=(6, 5))
     ConfusionMatrixDisplay.from_predictions(
-        y_test, y_pred, ax=ax, cmap="Blues",
-        display_labels=["No Disease", "Disease"]
+        y_test, y_pred, ax=ax, cmap="Blues", display_labels=["No Disease", "Disease"]
     )
     ax.set_title(f"Confusion Matrix - {model_name}")
     path = os.path.join(output_dir, f"confusion_matrix_{model_name}.png")
@@ -102,25 +106,23 @@ def plot_feature_importance(model, feature_names, model_name, output_dir):
     return path
 
 
-def train_and_log_model(model_name, model, param_grid, X_train, X_test,
-                        y_train, y_test, preprocessor):
+def train_and_log_model(model_name, model, param_grid, X_train, X_test, y_train, y_test, preprocessor):
     """
     Train a model with GridSearchCV, evaluate, and log to MLflow.
     """
-    pipeline = Pipeline(steps=[
-        ("preprocessor", preprocessor),
-        ("classifier", model),
-    ])
+    pipeline = Pipeline(
+        steps=[
+            ("preprocessor", preprocessor),
+            ("classifier", model),
+        ]
+    )
 
     # Build param grid with pipeline prefix
-    pipeline_param_grid = {
-        f"classifier__{k}": v for k, v in param_grid.items()
-    }
+    pipeline_param_grid = {f"classifier__{k}": v for k, v in param_grid.items()}
 
     # GridSearchCV with cross-validation
     grid_search = GridSearchCV(
-        pipeline, pipeline_param_grid, cv=5, scoring="roc_auc",
-        n_jobs=-1, return_train_score=True
+        pipeline, pipeline_param_grid, cv=5, scoring="roc_auc", n_jobs=-1, return_train_score=True
     )
 
     with mlflow.start_run(run_name=model_name):
@@ -137,9 +139,7 @@ def train_and_log_model(model_name, model, param_grid, X_train, X_test,
             mlflow.log_param(f"best_{clean_param}", value)
 
         # Cross-validation scores
-        cv_scores = cross_val_score(
-            best_pipeline, X_train, y_train, cv=5, scoring="roc_auc"
-        )
+        cv_scores = cross_val_score(best_pipeline, X_train, y_train, cv=5, scoring="roc_auc")
         mlflow.log_metric("cv_roc_auc_mean", cv_scores.mean())
         mlflow.log_metric("cv_roc_auc_std", cv_scores.std())
 
@@ -158,16 +158,13 @@ def train_and_log_model(model_name, model, param_grid, X_train, X_test,
         cm_path = plot_confusion_matrix(y_test, y_pred, model_name, artifacts_dir)
         mlflow.log_artifact(cm_path)
 
-        roc_path = plot_roc_curve(
-            best_pipeline, X_test, y_test, model_name, artifacts_dir
-        )
+        roc_path = plot_roc_curve(best_pipeline, X_test, y_test, model_name, artifacts_dir)
         mlflow.log_artifact(roc_path)
 
         # Feature importance for tree-based models
         feature_names = best_pipeline.named_steps["preprocessor"].get_feature_names_out()
         fi_path = plot_feature_importance(
-            best_pipeline.named_steps["classifier"],
-            feature_names, model_name, artifacts_dir
+            best_pipeline.named_steps["classifier"], feature_names, model_name, artifacts_dir
         )
         if fi_path:
             mlflow.log_artifact(fi_path)
@@ -211,7 +208,7 @@ def main():
                 "C": [0.01, 0.1, 1, 10],
                 "penalty": ["l1", "l2"],
                 "solver": ["saga"],
-            }
+            },
         },
         "RandomForest": {
             "model": RandomForestClassifier(random_state=42),
@@ -219,7 +216,7 @@ def main():
                 "n_estimators": [100, 200],
                 "max_depth": [5, 10, None],
                 "min_samples_split": [2, 5],
-            }
+            },
         },
         "GradientBoosting": {
             "model": GradientBoostingClassifier(random_state=42),
@@ -227,7 +224,7 @@ def main():
                 "n_estimators": [100, 200],
                 "max_depth": [3, 5],
                 "learning_rate": [0.01, 0.1],
-            }
+            },
         },
     }
 
@@ -239,8 +236,7 @@ def main():
 
     for name, config in models.items():
         pipeline, metrics = train_and_log_model(
-            name, config["model"], config["params"],
-            X_train, X_test, y_train, y_test, preprocessor
+            name, config["model"], config["params"], X_train, X_test, y_train, y_test, preprocessor
         )
         results[name] = metrics
         pipelines[name] = pipeline
@@ -270,9 +266,7 @@ def main():
         "models": {},
     }
     for name, metrics in results.items():
-        all_metadata["models"][name] = {
-            k: float(v) for k, v in metrics.items()
-        }
+        all_metadata["models"][name] = {k: float(v) for k, v in metrics.items()}
 
     metadata_path = os.path.join(MODELS_DIR, "models_metadata.json")
     with open(metadata_path, "w") as f:
@@ -326,22 +320,16 @@ def export_experiment_summary(results, model_configs, output_dir):
                 "model_type": name,
                 "test_size": 0.2,
                 "cv_folds": 5,
-                "hyperparameter_grid": {
-                    k: str(v) for k, v in config["params"].items()
-                },
+                "hyperparameter_grid": {k: str(v) for k, v in config["params"].items()},
             },
-            "metrics": {
-                k: round(float(v), 4) for k, v in results[name].items()
-            },
+            "metrics": {k: round(float(v), 4) for k, v in results[name].items()},
             "artifacts": [
                 f"confusion_matrix_{name}.png",
                 f"roc_curve_{name}.png",
-            ]
+            ],
         }
         if name in ("RandomForest", "GradientBoosting"):
-            experiment_log["runs"][name]["artifacts"].append(
-                f"feature_importance_{name}.png"
-            )
+            experiment_log["runs"][name]["artifacts"].append(f"feature_importance_{name}.png")
 
     log_path = os.path.join(run_dir, "experiment_runs_log.json")
     with open(log_path, "w") as f:
@@ -354,10 +342,7 @@ def export_experiment_summary(results, model_configs, output_dir):
         if os.path.exists(src_dir):
             for fname in os.listdir(src_dir):
                 if fname.endswith(".png"):
-                    shutil.copy2(
-                        os.path.join(src_dir, fname),
-                        os.path.join(run_dir, fname)
-                    )
+                    shutil.copy2(os.path.join(src_dir, fname), os.path.join(run_dir, fname))
     print(f"Copied artifact plots to {run_dir}")
 
 

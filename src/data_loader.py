@@ -29,7 +29,7 @@ def load_cleveland_data():
     heart_disease = fetch_ucirepo(id=DATASET_ID)
 
     X = heart_disease.data.features  # 13 features
-    y = heart_disease.data.targets   # 'num' column
+    y = heart_disease.data.targets  # 'num' column
 
     df = pd.concat([X, y], axis=1)
 

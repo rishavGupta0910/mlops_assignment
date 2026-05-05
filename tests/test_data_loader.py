@@ -23,8 +23,20 @@ class TestDataLoader:
     def test_load_expected_columns(self):
         df = load_cleveland_data()
         expected = [
-            "age", "sex", "cp", "trestbps", "chol", "fbs",
-            "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal", "num"
+            "age",
+            "sex",
+            "cp",
+            "trestbps",
+            "chol",
+            "fbs",
+            "restecg",
+            "thalach",
+            "exang",
+            "oldpeak",
+            "slope",
+            "ca",
+            "thal",
+            "num",
         ]
         for col in expected:
             assert col in df.columns, f"Missing column: {col}"

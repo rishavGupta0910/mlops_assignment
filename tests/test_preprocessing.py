@@ -33,20 +33,24 @@ class TestPreprocessing:
 
     def test_handle_missing_values(self):
         # Create test data with missing values
-        test_df = pd.DataFrame({
-            "a": [1.0, 2.0, None, 4.0],
-            "b": [10.0, None, 30.0, 40.0],
-        })
+        test_df = pd.DataFrame(
+            {
+                "a": [1.0, 2.0, None, 4.0],
+                "b": [10.0, None, 30.0, 40.0],
+            }
+        )
         result = handle_missing_values(test_df)
         assert result.isnull().sum().sum() == 0
         # Median of [1, 2, 4] = 2.0
         assert result["a"].iloc[2] == 2.0
 
     def test_binarize_target(self):
-        test_df = pd.DataFrame({
-            "feature1": [1, 2, 3, 4, 5],
-            "num": [0, 1, 2, 3, 4],
-        })
+        test_df = pd.DataFrame(
+            {
+                "feature1": [1, 2, 3, 4, 5],
+                "num": [0, 1, 2, 3, 4],
+            }
+        )
         result = binarize_target(test_df)
         assert "target" in result.columns
         assert "num" not in result.columns

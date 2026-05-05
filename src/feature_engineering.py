@@ -35,21 +35,18 @@ def build_preprocessor():
     ColumnTransformer
         Fitted-ready preprocessing transformer.
     """
-    numerical_transformer = Pipeline(steps=[
-        ("scaler", StandardScaler())
-    ])
+    numerical_transformer = Pipeline(steps=[("scaler", StandardScaler())])
 
-    categorical_transformer = Pipeline(steps=[
-        ("onehot", OneHotEncoder(drop="first", sparse_output=False,
-                                 handle_unknown="ignore"))
-    ])
+    categorical_transformer = Pipeline(
+        steps=[("onehot", OneHotEncoder(drop="first", sparse_output=False, handle_unknown="ignore"))]
+    )
 
     preprocessor = ColumnTransformer(
         transformers=[
             ("num", numerical_transformer, NUMERICAL_FEATURES),
             ("cat", categorical_transformer, CATEGORICAL_FEATURES),
         ],
-        remainder="drop"
+        remainder="drop",
     )
 
     return preprocessor
@@ -86,6 +83,7 @@ def prepare_data(df, test_size=0.2, random_state=42):
 if __name__ == "__main__":
     import os
     import sys
+
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from preprocessing import preprocess
 
