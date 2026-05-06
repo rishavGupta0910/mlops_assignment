@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-json
+data:
+  heart-disease-api.json: |
+    {
+      "annotations": {"list": []},
+      "title": "Heart Disease API Monitoring",
+      "uid": "heart-disease-api",
+      "panels": [
+        {
+          "title": "Request Rate (req/s)",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "targets": [
+            {
+              "expr": "rate(http_requests_total[1m])",
+              "legendFormat": "{{method}} {{handler}} {{status}}"
+            }
+          ]
+        },
+        {
+          "title": "Response Latency (p50, p95, p99)",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))",
+              "legendFormat": "p50"
+            },
+            {
+              "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
+              "legendFormat": "p95"
+            },
+            {
+              "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))",
+              "legendFormat": "p99"
+            }
+          ]
+        },
+        {
+          "title": "HTTP Status Codes",
+          "type": "piechart",
+          "gridPos": {"h": 8, "w": 6, "x": 0, "y": 8},
+          "targets": [
+            {
+              "expr": "sum by(status) (http_requests_total)",
+              "legendFormat": "{{status}}"
+            }
+          ]
+        },
+        {
+          "title": "Error Rate (non-2xx)",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 6, "x": 6, "y": 8},
+          "targets": [
+            {
+              "expr": "sum(rate(http_requests_total{status!~\"2..\"}[1m]))",
+              "legendFormat": "errors/s"
+            }
+          ]
+        },
+        {
+          "title": "Total Requests",
+          "type": "stat",
+          "gridPos": {"h": 8, "w": 6, "x": 12, "y": 8},
+          "targets": [
+            {
+              "expr": "sum(http_requests_total)",
+              "legendFormat": "total"
+            }
+          ]
+        },
+        {
+          "title": "Active Requests",
+          "type": "stat",
+          "gridPos": {"h": 8, "w": 6, "x": 18, "y": 8},
+          "targets": [
+            {
+              "expr": "http_requests_in_progress",
+              "legendFormat": "in progress"
+            }
+          ]
+        }
+      ],
+      "time": {"from": "now-15m", "to": "now"},
+      "refresh": "5s",
+      "schemaVersion": 39
+    }

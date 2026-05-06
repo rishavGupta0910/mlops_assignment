@@ -493,21 +493,88 @@ def generate_report():
 
     doc.add_page_break()
 
-    # ========== MONITORING (Day 4 placeholder) ==========
+    # ========== MONITORING & LOGGING ==========
     add_heading_styled(doc, "9. Monitoring & Logging", level=1)
-    doc.add_paragraph("[To be completed on Day 4 - Prometheus metrics, Grafana dashboard, " "API request logging]")
+
+    add_heading_styled(doc, "API Request Logging", level=2)
+    doc.add_paragraph(
+        "The FastAPI application includes structured JSON logging for every prediction "
+        "request. Each log entry includes: timestamp, input features, prediction result, "
+        "confidence score, and model name. This provides an audit trail for debugging "
+        "and compliance."
+    )
+
+    add_heading_styled(doc, "Prometheus Metrics", level=2)
+    doc.add_paragraph(
+        "The /metrics endpoint (auto-instrumented via prometheus-fastapi-instrumentator) "
+        "exposes standard HTTP metrics in Prometheus format:"
+    )
+    prom_metrics = [
+        "http_requests_total - counter of all requests by method, handler, and status",
+        "http_request_duration_seconds - histogram of request latency",
+        "http_requests_in_progress - gauge of concurrent requests",
+    ]
+    for m in prom_metrics:
+        doc.add_paragraph(m, style="List Bullet")
+
+    add_heading_styled(doc, "Monitoring Stack (Prometheus + Grafana)", level=2)
+    doc.add_paragraph("A monitoring stack is deployed in the GKE cluster alongside the API:")
+    stack_items = [
+        "Prometheus (prom/prometheus:v2.51.0) - scrapes /metrics every 15s from the API service",
+        "Grafana (grafana/grafana:10.4.0) - provides dashboards with pre-configured Prometheus datasource",
+    ]
+    for item in stack_items:
+        doc.add_paragraph(item, style="List Bullet")
+
+    doc.add_paragraph(
+        "The Grafana dashboard displays: request rate, response latency percentiles "
+        "(p50/p95/p99), HTTP status code distribution, error rate, total requests, "
+        "and active requests. Access Grafana via port-forward:"
+    )
+    doc.add_paragraph("kubectl port-forward svc/grafana 3000:3000", style="List Bullet")
+
+    doc.add_paragraph(
+        "A traffic generation script (scripts/generate_traffic.sh) sends randomized "
+        "prediction requests to populate the dashboards with live data."
+    )
 
     doc.add_page_break()
 
-    add_heading_styled(doc, "10. Architecture Diagram & Conclusion", level=1)
+    # ========== ARCHITECTURE & CONCLUSION ==========
+    add_heading_styled(doc, "10. Architecture & Conclusion", level=1)
+
+    add_heading_styled(doc, "End-to-End Pipeline Architecture", level=2)
+    doc.add_paragraph("The complete MLOps pipeline flow:")
+    arch_steps = [
+        "1. Data Acquisition: UCI Repository via ucimlrepo package (dataset ID 45)",
+        "2. Preprocessing: Missing value imputation + target binarization",
+        "3. Feature Engineering: sklearn ColumnTransformer (StandardScaler + OneHotEncoder)",
+        "4. Training: 3 models with GridSearchCV, 5-fold stratified CV",
+        "5. Experiment Tracking: MLflow logs params, metrics, artifacts per run",
+        "6. Model Packaging: joblib pickle + models_metadata.json",
+        "7. API: FastAPI with /predict, /health, /metrics endpoints",
+        "8. Containerization: Docker (python:3.11-slim)",
+        "9. CI/CD: GitHub Actions (lint -> test -> build+push -> deploy)",
+        "10. Deployment: GKE (1 replica, LoadBalancer, health probes)",
+        "11. Monitoring: Prometheus + Grafana (request rate, latency, errors)",
+    ]
+    for step in arch_steps:
+        doc.add_paragraph(step, style="List Bullet")
+
+    add_heading_styled(doc, "Conclusion", level=2)
     doc.add_paragraph(
-        "[To be added - End-to-end pipeline diagram: Data -> Preprocessing -> "
-        "Training (MLflow) -> Model Packaging -> Docker -> GKE -> API -> Monitoring]"
+        "This project demonstrates a complete MLOps lifecycle from raw data to "
+        "production-deployed model with automated CI/CD and monitoring. Key outcomes:"
     )
-    doc.add_paragraph("")
-    doc.add_paragraph(
-        "[To be completed on Day 4 - Summary of findings, lessons learned, " "and link to code repository]"
-    )
+    conclusions = [
+        "Logistic Regression achieved best performance (ROC-AUC: 0.9643) on the Cleveland dataset",
+        "Full reproducibility via ucimlrepo data fetching and pinned requirements",
+        "Automated pipeline ensures code quality (lint + 32 tests) before deployment",
+        "Production API serves predictions at http://34.60.20.112 with sub-second latency",
+        "Monitoring stack provides real-time visibility into API health and performance",
+    ]
+    for c in conclusions:
+        doc.add_paragraph(c, style="List Bullet")
 
     # Save
     output_path = os.path.join(REPORT_DIR, "MLOps_Assignment1_Report.docx")
