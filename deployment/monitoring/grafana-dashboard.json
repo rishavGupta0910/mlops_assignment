@@ -10,9 +10,99 @@ data:
       "uid": "heart-disease-api",
       "panels": [
         {
+          "title": "Prediction Distribution",
+          "type": "piechart",
+          "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+          "targets": [
+            {
+              "expr": "sum by(prediction_class) (ml_predictions_total)",
+              "legendFormat": "{{prediction_class}}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "palette-classic"}
+            }
+          }
+        },
+        {
+          "title": "Prediction Rate by Class",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0},
+          "targets": [
+            {
+              "expr": "rate(ml_predictions_total[1m])",
+              "legendFormat": "{{prediction_class}}"
+            }
+          ]
+        },
+        {
+          "title": "Total Predictions",
+          "type": "stat",
+          "gridPos": {"h": 8, "w": 4, "x": 16, "y": 0},
+          "targets": [
+            {
+              "expr": "sum(ml_predictions_total)",
+              "legendFormat": "total"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "fixed", "fixedColor": "blue"}
+            }
+          }
+        },
+        {
+          "title": "Active Model",
+          "type": "stat",
+          "gridPos": {"h": 8, "w": 4, "x": 20, "y": 0},
+          "targets": [
+            {
+              "expr": "ml_model_info",
+              "legendFormat": "{{model_name}}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "fixed", "fixedColor": "green"},
+              "mappings": [{"options": {"1": {"text": "Active"}}, "type": "value"}]
+            }
+          }
+        },
+        {
+          "title": "Confidence Score Distribution",
+          "type": "histogram",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+          "targets": [
+            {
+              "expr": "sum(increase(ml_prediction_confidence_bucket[5m])) by (le)",
+              "legendFormat": "{{le}}",
+              "format": "heatmap"
+            }
+          ]
+        },
+        {
+          "title": "Average Confidence Score",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+          "targets": [
+            {
+              "expr": "rate(ml_prediction_confidence_sum[5m]) / rate(ml_prediction_confidence_count[5m])",
+              "legendFormat": "avg confidence"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "min": 0,
+              "max": 1,
+              "custom": {"fillOpacity": 20}
+            }
+          }
+        },
+        {
           "title": "Request Rate (req/s)",
           "type": "timeseries",
-          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
           "targets": [
             {
               "expr": "rate(http_requests_total[1m])",
@@ -23,7 +113,7 @@ data:
         {
           "title": "Response Latency (p50, p95, p99)",
           "type": "timeseries",
-          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
           "targets": [
             {
               "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))",
@@ -42,7 +132,7 @@ data:
         {
           "title": "HTTP Status Codes",
           "type": "piechart",
-          "gridPos": {"h": 8, "w": 6, "x": 0, "y": 8},
+          "gridPos": {"h": 8, "w": 6, "x": 0, "y": 24},
           "targets": [
             {
               "expr": "sum by(status) (http_requests_total)",
@@ -53,7 +143,7 @@ data:
         {
           "title": "Error Rate (non-2xx)",
           "type": "timeseries",
-          "gridPos": {"h": 8, "w": 6, "x": 6, "y": 8},
+          "gridPos": {"h": 8, "w": 6, "x": 6, "y": 24},
           "targets": [
             {
               "expr": "sum(rate(http_requests_total{status!~\"2..\"}[1m]))",
@@ -64,7 +154,7 @@ data:
         {
           "title": "Total Requests",
           "type": "stat",
-          "gridPos": {"h": 8, "w": 6, "x": 12, "y": 8},
+          "gridPos": {"h": 8, "w": 6, "x": 12, "y": 24},
           "targets": [
             {
               "expr": "sum(http_requests_total)",
@@ -75,7 +165,7 @@ data:
         {
           "title": "Active Requests",
           "type": "stat",
-          "gridPos": {"h": 8, "w": 6, "x": 18, "y": 8},
+          "gridPos": {"h": 8, "w": 6, "x": 18, "y": 24},
           "targets": [
             {
               "expr": "http_requests_in_progress",

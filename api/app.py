@@ -16,6 +16,7 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_client import Counter, Histogram, Gauge
 
 # Add src to path for inference module
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src"))
@@ -38,6 +39,30 @@ app = FastAPI(
 
 # Prometheus instrumentation
 Instrumentator().instrument(app).expose(app)
+
+# Custom ML metrics
+PREDICTION_COUNTER = Counter(
+    "ml_predictions_total",
+    "Total predictions by class",
+    ["prediction_class"],
+)
+CONFIDENCE_HISTOGRAM = Histogram(
+    "ml_prediction_confidence",
+    "Confidence score distribution",
+    buckets=[0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 0.99, 1.0],
+)
+MODEL_INFO = Gauge(
+    "ml_model_info",
+    "Currently loaded model information",
+    ["model_name"],
+)
+
+# Set model info gauge on startup
+try:
+    _, _model_name = load_model()
+    MODEL_INFO.labels(model_name=_model_name).set(1)
+except Exception:
+    pass
 
 
 class PatientFeatures(BaseModel):
@@ -105,6 +130,10 @@ def make_prediction(features: PatientFeatures):
     except Exception as e:
         logger.error(f"Prediction failed: {e}")
         raise HTTPException(status_code=500, detail=f"Prediction error: {e}")
+
+    # Record ML metrics
+    PREDICTION_COUNTER.labels(prediction_class=result["prediction_label"]).inc()
+    CONFIDENCE_HISTOGRAM.observe(result["confidence"])
 
     response = PredictionResponse(
         prediction=result["prediction"],
