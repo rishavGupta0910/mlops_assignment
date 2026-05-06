@@ -116,18 +116,44 @@ kubectl get svc heart-disease-api
 
 ```bash
 kubectl apply -f deployment/monitoring/
+```
 
-# Port-forward Grafana
+### Access Grafana Dashboard
+
+```bash
+# Port-forward Grafana to localhost
 kubectl port-forward svc/grafana 3000:3000
 
-# Open http://localhost:3000 (admin/admin)
+# Open in browser
+open http://localhost:3000
 ```
+
+- **Login**: admin / admin (skip password change)
+- Navigate to **Dashboards → Heart Disease API Monitoring**
+- The dashboard includes:
+  - **ML Metrics**: Prediction distribution, confidence scores, active model info
+  - **API Metrics**: Request rate, latency percentiles, HTTP status codes, error rate
+
+### Access Prometheus
+
+```bash
+kubectl port-forward svc/prometheus 9090:9090
+
+# Open http://localhost:9090
+```
+
+Useful queries:
+- `ml_predictions_total` — Total predictions by class
+- `ml_prediction_confidence_bucket` — Confidence score distribution
+- `rate(http_requests_total[1m])` — Request rate
 
 ### Generate Test Traffic
 
 ```bash
 ./scripts/generate_traffic.sh http://EXTERNAL_IP 50
 ```
+
+This sends randomized prediction requests to populate the monitoring dashboards.
 
 ## CI/CD Pipeline
 
