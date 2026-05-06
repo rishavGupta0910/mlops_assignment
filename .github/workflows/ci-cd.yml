@@ -113,7 +113,8 @@ jobs:
       - name: Deploy to GKE
         run: |
           kubectl apply -f deployment/k8s/
+          kubectl apply -f deployment/monitoring/
           kubectl set image deployment/heart-disease-api heart-disease-api=${{ env.IMAGE }}:${{ github.sha }}
 
       - name: Verify deployment
-        run: kubectl rollout status deployment/heart-disease-api --timeout=120s
+        run: kubectl rollout status deployment/heart-disease-api --timeout=300s
