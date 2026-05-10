@@ -1,0 +1,14 @@
+artifact_uri: /Users/rishavgupta/Desktop/mlops/mlops_assignment/experiment_tracking/242041841724677674/bd8c26964e8a4563ada0679dabc2674e/artifacts
+end_time: 1778409981811
+entry_point_name: ''
+experiment_id: '242041841724677674'
+lifecycle_stage: active
+run_id: bd8c26964e8a4563ada0679dabc2674e
+run_name: GradientBoosting
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1778409979110
+status: 3
+tags: []
+user_id: rishavgupta
