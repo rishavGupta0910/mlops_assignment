@@ -150,7 +150,7 @@ Useful queries:
 ### Generate Test Traffic
 
 ```bash
-./scripts/generate_traffic.sh http://EXTERNAL_IP 50
+./scripts/generate_traffic.sh http://34.60.20.112 50
 ```
 
 This sends randomized prediction requests to populate the monitoring dashboards.
