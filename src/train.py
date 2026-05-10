@@ -47,7 +47,7 @@ TRAINING_ARTIFACTS_DIR = os.path.join(BASE_DIR, "training_artifacts")
 
 def evaluate_model(model, X_test, y_test):
     """Compute classification metrics."""
-    print(f'Starting evaluation for mode: {model} ')
+    print(f'Starting evaluation for mode: {model}')
     y_pred = model.predict(X_test)
     y_proba = model.predict_proba(X_test)[:, 1]
 
